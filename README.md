@@ -15,16 +15,21 @@ API para gerenciamento de pets com CRUD completo, filtros, paginação, ordenaç
 
 ### Implementadas
 - Health check (`/health`)  
-- CRUD completo de pets (via Sequelize)  
+- **POST /pets**: criação de pets com validação completa, retorno 201/400
+- **GET /pets**: listagem com filtros, paginação e ordenação
+- **GET /pets/:id**: busca pet por ID, retorna 404 se não encontrado
 - Integração com PostgreSQL  
 - Status de pets (`available` / `adopted`)  
 - Localização por cidade e coordenada(`shelter_city` , `shelter_lat` , `shelter_lng`) 
 - Tabela `pets` com campos: `id (UUID)`, `name`, `species (dog|cat)`, `breed`, `age_years`, `shelter_city`, `shelter_lat`, `shelter_lng`, `status`, `created_at`, `updated_at`
+- Validação de campos obrigatórios e opcionais
+- Filtros por: `name` (busca parcial), `species`, `breed` (busca parcial), `shelter_city` (busca parcial), `status`
+- Paginação: `page` (padrão 1), `perPage` (padrão 10, máx 100)
+- Ordenação: `sortBy` (campos permitidos), `order` (asc/desc)
 
 ### Em andamento
-- **POST /pets**: validação de campos, inserção no banco e retorno de 201 ou 400  
-- **GET /pets**: filtros, paginação e ordenação usando query params (`name`, `species`, `breed`, `shelter_city`, `status`, `page`, `perPage`, `sortBy`, `order`)  
-- **GET /pets/:id**: busca por ID, retorna 404 se não encontrado  
+- **PUT /pets/:id**: atualização de pet existente
+- **DELETE /pets/:id**: remoção de pet
 - **GET /breeds/:species**: integração com TheDogAPI/TheCatAPI, cache em memória de 1 hora, normalização de resposta `{ name, origin, energy_level, image_url }`
 
 ---
@@ -70,6 +75,29 @@ API para gerenciamento de pets com CRUD completo, filtros, paginação, ordenaç
 - `src/models/index.js`: inicializa Sequelize, importa `Pet` e exporta instância.  
 - Testes de conexão realizados com sucesso.
 
+### Etapa 4 – POST /pets
+- Implementação do endpoint de criação de pets
+- Validação completa de campos obrigatórios e opcionais
+- Tratamento de erros com respostas 400/500
+- Integração com Sequelize para inserção no banco
+- Retorno 201 com dados do pet criado
+
+### Etapa 5 – GET /pets (Filtros, Paginação, Ordenação)
+- Implementação do endpoint de listagem de pets
+- Filtros: name (busca parcial), species, breed (busca parcial), shelter_city (busca parcial), status
+- Paginação: page (padrão 1), perPage (padrão 10, máx 100)
+- Ordenação: sortBy (campos permitidos), order (asc/desc)
+- Resposta formatada: { total, page, perPage, totalPages, data }
+- Validação de parâmetros de query
+
+### Etapa 6 – GET /pets/:id
+- Implementação do endpoint de busca de pet por ID
+- Busca por chave primária usando Sequelize findByPk()
+- Retorno 200 com dados completos do pet se encontrado
+- Retorno 404 com mensagem de erro se não encontrado
+- Validação de parâmetro ID obrigatório
+- Tratamento de erros com respostas 400/500
+- Todos os testes de rotas possiveis foram feitos usando Postman e retornados com sucesso
 
 ---
 
@@ -83,10 +111,14 @@ AdoteUmPet/
 │   │   ├── config/
 │   │   │   └── database.js    # Configuração do banco de dados
 │   │   ├── controllers/       # Controladores da API
+│   │   │   ├── index.js
+│   │   │   └── petController.js # Controller de pets (GET, POST)
 │   │   ├── models/            # Modelos Sequelize
 │   │   │   ├── index.js
 │   │   │   └── pet.js
 │   │   ├── routes/            # Rotas da API
+│   │   │   ├── index.js
+│   │   │   └── petRoutes.js   # Rotas de pets (/pets)
 │   │   ├── utils/             # Funções utilitárias
 │   │   ├── migrations/        # Migrações do banco
 │   │   ├── seeders/           # Seeders do banco
@@ -137,11 +169,18 @@ npm start
 - `GET /health` → Retorna status da API
 
 ### Pets
-- `GET /api/pets` → Lista todos os pets  
-- `GET /api/pets/:id` → Detalhes do pet  
-- `POST /api/pets` → Cria novo pet  
-- `PUT /api/pets/:id` → Atualiza pet  
-- `DELETE /api/pets/:id` → Remove pet
+- `GET /pets` → Lista pets com filtros, paginação e ordenação
+  - Query params: `name`, `species`, `breed`, `shelter_city`, `status`, `page`, `perPage`, `sortBy`, `order`
+  - Resposta: `{ total, page, perPage, totalPages, data }`
+- `GET /pets/:id` → Busca pet por ID
+  - Params: `id` (UUID do pet)
+  - Resposta: 200 com dados do pet ou 404 se não encontrado
+- `POST /pets` → Cria novo pet
+  - Body: `{ name, species, breed, age_years, shelter_city, shelter_lat, shelter_lng, status? }`
+  - Validação completa de campos
+  - Resposta: 201 com pet criado ou 400 com erros
+- `PUT /pets/:id` → Atualiza pet (em desenvolvimento)
+- `DELETE /pets/:id` → Remove pet (em desenvolvimento)
 
 ### Breeds
 - `GET /breeds/:species` → Lista raças do TheDogAPI/TheCatAPI, resposta normalizada, cache 1 hora
