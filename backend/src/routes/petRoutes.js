@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const petController = require('../controllers/petController');
 
-// POST /pets - Create a new pet
-router.post('/', petController.createPet);
+
+router.get('/', petController.getPets); //lista pagina, filtros ...
+
+router.post('/', petController.createPet); //cria um novo pet
 
 module.exports = router;
