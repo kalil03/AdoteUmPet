@@ -1,6 +1,37 @@
 const { Pet } = require('../models');
 const { Op } = require('sequelize');
 
+const getPetById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // valida se o ID foi fornecido
+    if (!id) {
+      return res.status(400).json({
+        error: 'ID inválido',
+        message: 'ID do pet é obrigatório'
+      });
+    }
+    // busca pet por id
+    const pet = await Pet.findByPk(id);
+    // se não encontrou, retorna 404
+    if (!pet) {
+      return res.status(404).json({
+        error: 'Pet not found',
+        message: 'Pet não encontrado com o ID fornecido'
+      });
+    }
+    // retorna o pet encontrado
+    res.status(200).json(pet);
+
+  } catch (error) {
+    console.error('Erro ao buscar pet por ID:', error);
+    res.status(500).json({
+      error: 'Erro interno do servidor',
+      message: 'Não foi possível buscar o pet'
+    });
+  }
+};
+
 const getPets = async (req, res) => {
   try {
     // extrai parametros de query
@@ -182,6 +213,7 @@ const createPet = async (req, res) => {
 };
 
 module.exports = {
+  getPetById,
   getPets,
   createPet
 };
