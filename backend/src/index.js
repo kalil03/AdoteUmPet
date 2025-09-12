@@ -4,6 +4,9 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 
+// Import routes
+const petRoutes = require('./routes/petRoutes');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -24,10 +27,14 @@ app.get('/', (req, res) => {
     message: 'Bem-vindo à API AdoteUmPet',
     version: '1.0.0',
     endpoints: {
-      health: '/health'
+      health: '/health',
+      pets: '/pets'
     }
   });
 });
+
+// Register routes
+app.use('/pets', petRoutes);
 //tratamento erros
 app.use((err, req, res, next) => {
   console.error(err.stack);
