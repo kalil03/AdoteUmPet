@@ -4,7 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 
-// Import routes
+// importa rota
 const petRoutes = require('./routes/petRoutes');
 
 const app = express();
@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Register routes
+// registra rota
 app.use('/pets', petRoutes);
 //tratamento erros
 app.use((err, req, res, next) => {
