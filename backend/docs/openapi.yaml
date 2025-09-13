@@ -1,0 +1,472 @@
+openapi: 3.0.3
+info:
+  title: AdoteUmPet API
+  description: API para gerenciamento de pets para adoção com endereçamento brasileiro
+  version: 1.0.0
+  contact:
+    name: AdoteUmPet
+    email: contato@adoteumpet.com
+servers:
+  - url: http://localhost:3000
+    description: Servidor de desenvolvimento
+  - url: http://localhost:3000
+    description: Servidor Docker
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Verificar status da API
+      description: Endpoint para verificar se a API está funcionando
+      responses:
+        '200':
+          description: API funcionando corretamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+  /pets:
+    get:
+      tags:
+        - Pets
+      summary: Listar pets
+      description: Lista pets com filtros, paginação e ordenação
+      parameters:
+        - name: name
+          in: query
+          description: Filtrar por nome do pet (busca parcial)
+          schema:
+            type: string
+        - name: species
+          in: query
+          description: Filtrar por espécie
+          schema:
+            type: string
+            enum: [dog, cat]
+        - name: breed
+          in: query
+          description: Filtrar por raça (busca parcial)
+          schema:
+            type: string
+        - name: shelter_city
+          in: query
+          description: Filtrar por cidade do abrigo (busca parcial)
+          schema:
+            type: string
+        - name: shelter_state
+          in: query
+          description: Filtrar por estado (UF)
+          schema:
+            type: string
+            maxLength: 2
+        - name: shelter_neighborhood
+          in: query
+          description: Filtrar por bairro (busca parcial)
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filtrar por status de adoção
+          schema:
+            type: string
+            enum: [available, adopted]
+        - name: page
+          in: query
+          description: Número da página
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: perPage
+          in: query
+          description: Itens por página
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: sortBy
+          in: query
+          description: Campo para ordenação
+          schema:
+            type: string
+            enum: [name, species, breed, age_years, shelter_city, created_at]
+            default: created_at
+        - name: order
+          in: query
+          description: Ordem da classificação
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Lista de pets retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Total de pets encontrados
+                  page:
+                    type: integer
+                    description: Página atual
+                  perPage:
+                    type: integer
+                    description: Itens por página
+                  totalPages:
+                    type: integer
+                    description: Total de páginas
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Pet'
+        '400':
+          description: Parâmetros inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Pets
+      summary: Cadastrar novo pet
+      description: Cria um novo pet no sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetInput'
+      responses:
+        '201':
+          description: Pet criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /pets/{id}:
+    get:
+      tags:
+        - Pets
+      summary: Buscar pet por ID
+      description: Retorna um pet específico pelo seu ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único do pet (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Pet encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '404':
+          description: Pet não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - Pets
+      summary: Atualizar pet
+      description: Atualiza os dados de um pet existente (suporte a atualizações parciais)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único do pet (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetInput'
+      responses:
+        '200':
+          description: Pet atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Pet não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Pets
+      summary: Remover pet
+      description: Remove um pet do sistema
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único do pet (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Pet removido com sucesso
+        '404':
+          description: Pet não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /breeds/{species}:
+    get:
+      tags:
+        - Breeds
+      summary: Listar raças por espécie
+      description: Lista raças de cães ou gatos com informações normalizadas das APIs externas
+      parameters:
+        - name: species
+          in: path
+          required: true
+          description: Espécie do animal
+          schema:
+            type: string
+            enum: [dog, cat]
+      responses:
+        '200':
+          description: Lista de raças retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Breed'
+        '400':
+          description: Espécie inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erro ao consultar APIs externas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identificador único do pet
+        name:
+          type: string
+          description: Nome do pet
+          example: "Buddy"
+        species:
+          type: string
+          enum: [dog, cat]
+          description: Espécie do animal
+        breed:
+          type: string
+          description: Raça do pet
+          example: "Golden Retriever"
+        age_years:
+          type: integer
+          minimum: 0
+          description: Idade do pet em anos
+          example: 3
+        shelter_city:
+          type: string
+          description: Cidade do abrigo
+          example: "São Paulo"
+        shelter_cep:
+          type: string
+          pattern: '^\d{5}-?\d{3}$'
+          description: CEP do abrigo
+          example: "01234-567"
+        shelter_street:
+          type: string
+          maxLength: 255
+          description: Rua do abrigo
+          example: "Rua das Flores"
+        shelter_number:
+          type: string
+          maxLength: 20
+          description: Número do abrigo
+          example: "123"
+        shelter_neighborhood:
+          type: string
+          maxLength: 100
+          description: Bairro do abrigo
+          example: "Centro"
+        shelter_state:
+          type: string
+          maxLength: 2
+          description: Estado do abrigo (UF)
+          example: "SP"
+        status:
+          type: string
+          enum: [available, adopted]
+          description: Status de adoção
+          default: available
+        created_at:
+          type: string
+          format: date-time
+          description: Data de criação
+        updated_at:
+          type: string
+          format: date-time
+          description: Data da última atualização
+
+    PetInput:
+      type: object
+      required:
+        - name
+        - species
+        - breed
+        - age_years
+        - shelter_city
+        - shelter_cep
+        - shelter_street
+        - shelter_number
+        - shelter_neighborhood
+        - shelter_state
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Nome do pet
+          example: "Buddy"
+        species:
+          type: string
+          enum: [dog, cat]
+          description: Espécie do animal
+        breed:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Raça do pet
+          example: "Golden Retriever"
+        age_years:
+          type: integer
+          minimum: 0
+          maximum: 30
+          description: Idade do pet em anos
+          example: 3
+        shelter_city:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Cidade do abrigo
+          example: "São Paulo"
+        shelter_cep:
+          type: string
+          pattern: '^\d{5}-?\d{3}$'
+          description: CEP do abrigo (formato brasileiro)
+          example: "01234-567"
+        shelter_street:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Rua do abrigo
+          example: "Rua das Flores"
+        shelter_number:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: Número do abrigo
+          example: "123"
+        shelter_neighborhood:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Bairro do abrigo
+          example: "Centro"
+        shelter_state:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: Estado do abrigo (UF)
+          example: "SP"
+        status:
+          type: string
+          enum: [available, adopted]
+          description: Status de adoção
+          default: available
+
+    Breed:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome da raça
+          example: "Golden Retriever"
+        origin:
+          type: string
+          description: País ou região de origem
+          example: "Escócia"
+        energy_level:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Nível de energia (1=baixo, 5=alto)
+          example: 4
+        temperament:
+          type: string
+          description: Temperamento da raça
+          example: "Amigável, Inteligente, Devotado"
+        image_url:
+          type: string
+          format: uri
+          description: URL da imagem da raça
+          nullable: true
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Mensagem de erro
+        details:
+          type: object
+          description: Detalhes adicionais do erro
+          nullable: true

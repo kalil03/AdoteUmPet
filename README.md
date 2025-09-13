@@ -1,19 +1,15 @@
 # AdoteUmPet - Plataforma para gerenciar pets para adoção e consultar informações de raças.
 
-**Status:** Funcional com endereçamento brasileiro
-
-Sistema completo para gerenciamento de adoção de animais com backend Node.js + Express, frontend React e integração com padrão brasileiro de endereçamento (CEP).
+Sistema completo para gerenciamento de adoção de animais com backend Node.js + Express, PostgreSQL + Sequelize ORM, frontend React + Vite + Tailwind CSS, integração com TheDogAPI/TheCatAPI, Mapa leaflet, Swagger para documentação da API e Jest para testes automatizados, Nodemon para desenvolvimento e dotenv para gerenciamento de variáveis de ambiente.   
 
 ---
 
 ## Visão Geral
-Sistema completo para gerenciamento de pets com CRUD, filtros, paginação, ordenação e integração com TheDogAPI/TheCatAPI. **Agora com endereçamento brasileiro (CEP) e integração automática com ViaCEP!**
+Gerenciamento de pets com CRUD, filtros, paginação, ordenação e integração com TheDogAPI/TheCatAPI, Mapa leaflet para localização dos abrigos.
 
 ---
 
 ## Funcionalidades
-
-### Já implementadas
 
 **API Backend:**
 - Endpoint de health check (`/health`) para monitoramento
@@ -27,7 +23,7 @@ Sistema completo para gerenciamento de pets com CRUD, filtros, paginação, orde
 **Gerenciamento de dados:**
 - Integração completa com PostgreSQL usando Sequelize ORM
 - Sistema de status para pets (`available` / `adopted`)
-- **Endereçamento brasileiro completo**: CEP, rua, número, bairro, cidade, estado
+- Endereçamento brasileiro completo: CEP, rua, número, bairro, cidade, estado 
 - **Integração automática com ViaCEP**: Preenchimento automático de endereço via CEP
 - Validação robusta de campos obrigatórios e opcionais
 - Cache em memória para consultas de raças (1 hora de duração)
@@ -35,19 +31,14 @@ Sistema completo para gerenciamento de pets com CRUD, filtros, paginação, orde
 
 **Sistema de filtros e busca:**
 - Busca por nome do pet (busca parcial)
-- Filtro por espécie (cão ou gato)
-- Filtro por raça (busca parcial)
-- Filtro por cidade do abrigo (busca parcial)
-- Filtro por estado (busca parcial)
-- Filtro por bairro (busca parcial)
-- Filtro por status de adoção
-- Paginação configurável (padrão: 10 itens por página, máximo: 100)
-- Ordenação por diferentes campos (crescente/decrescente)
+- Filtro por espécie, raça, cidade, estado, bairro, status de adoção
+- Paginação configurável 
+- Ordenação por diferentes campos
 
 **Frontend React:**
 - Interface completa desenvolvida com Vite e Tailwind CSS
 - Páginas: Lista de Pets, Cadastro de Pet, Detalhes do Pet, Consulta de Raças
-- **Formulário brasileiro:** Campos de CEP, rua, número, bairro, cidade, estado no lugar de latitude e longitude
+- Formulário brasileiro: Campos de CEP, rua, número, bairro, cidade, estado no lugar de latitude e longitude
 - **Preenchimento automático:** Integração com ViaCEP para busca por CEP
 - **Exibição de endereço**: Lista e detalhes mostram endereço completo formatado
 - **Mapa interativo**: Visualização da localização dos abrigos com Leaflet
@@ -60,12 +51,17 @@ Sistema completo para gerenciamento de pets com CRUD, filtros, paginação, orde
 - **Dados de exemplo**: 15 pets de diferentes cidades brasileiras
 - **Upsert seguro**: Importação que pode ser executada múltiplas vezes
 
-### Próximas melhorias
-- **Testes automatizados**: Backend e frontend com cobertura > 60% e relatórios
-- **Cache de filtros**: Sistema de cache para consultas de pets com filtros
-- **Docker Compose**: Containerização completa (API + PostgreSQL + Adminer/PgAdmin)
-- **CI/CD Pipeline**: Integração contínua com lint e testes automatizados
-- **Swagger/OpenAPI**: Documentação interativa da API
+**Documentação da API:**
+- **Swagger/OpenAPI**: Documentação interativa completa disponível em `/docs`
+- **Schemas detalhados**: Modelos de request/response com validação
+- **Testes interativos**: Execute endpoints diretamente pela interface web
+- **Endereçamento brasileiro**: Documentação específica para campos de CEP e UF
+
+**Testes automatizados:**
+- **Jest + Supertest**: Suite completa de testes para API REST
+- **Cobertura de código**: Relatórios detalhados com Jest coverage
+- **Testes de integração**: Validação completa de endpoints com banco de dados de teste
+- **29 testes implementados**: POST/GET /pets com validação, filtros, paginação e ordenação
 
 ---
 
@@ -91,6 +87,9 @@ Sistema completo para gerenciamento de pets com CRUD, filtros, paginação, orde
 - Sequelize CLI para migrations e seeders
 - **csv-parser** para processamento de arquivos CSV
 - **ViaCEP API** para consulta automática de endereços brasileiros
+- **Swagger UI Express** para documentação interativa da API
+- **Jest** para testes unitários e de integração
+- **Supertest** para testes de API REST
 
 ---
 
@@ -102,7 +101,7 @@ O projeto foi estruturado seguindo boas práticas de desenvolvimento:
 - **PostgreSQL com Sequelize**: escolhido pela robustez e facilidade de manutenção
 - **UUID como chave primária**: garante identificadores únicos e seguros
 - **Migrations e Seeders**: permitem versionamento e replicação do banco de dados
-- **Endereçamento brasileiro**: Migração de coordenadas para padrão nacional (CEP)
+- **Endereçamento brasileiro**: Nos requisitos estava para usar latitude e longitude mas optei por usar o endereço para padrão nacional CEP
 - **Integração com APIs nacionais**: ViaCEP para validação e preenchimento automático
 - **Configuração flexível**: suporte tanto para desenvolvimento quanto para produção
 
@@ -127,11 +126,13 @@ Implementei progressivamente os endpoints principais:
 - **GET /pets**: Para listar pets com sistema de filtros, paginação e ordenação
 - **GET /pets/:id**: Para buscar pets específicos por ID
 - **GET /breeds/:species**: Para consultar informações de raças
+- **PUT /pets/:id**: Para atualizar dados de pets existentes
+- **DELETE /pets/:id**: Para remover pets existentes
+
+Todos os endpoints foram testados extensivamente usando Postman para garantir o funcionamento correto em diferentes cenários.
 
 ### 5. Frontend React
 Desenvolvi uma interface completa usando React, Vite e Tailwind CSS, com páginas para listagem, cadastro e detalhes dos pets, além da consulta de raças.
-
-Todos os endpoints foram testados extensivamente usando Postman para garantir o funcionamento correto em diferentes cenários.
 
 ### 6. Normalização Inteligente de APIs Externas
 Implementei um sistema robusto de normalização para as APIs de raças (TheDogAPI/TheCatAPI) que resolve inconsistências nos dados:
@@ -143,57 +144,94 @@ Implementei um sistema robusto de normalização para as APIs de raças (TheDogA
 
 **Nível de Energia:**
 - Para gatos: Usa o campo `energy_level` nativo da API
-- Para cães: Mapeia o campo `temperament` para níveis de energia:
-  - Temperamentos ativos/brincalhões → nível 5 (alta energia)
-  - Temperamentos calmos/dóceis → nível 2 (baixa energia)
-  - Temperamentos alertas/inteligentes → nível 4 (média-alta energia)
-  - Padrão → nível 3 (energia média)
+- Para cães: Mapeia o campo `temperament` para níveis de energia
 
+**Tradução de Temperamento:**
+- Traduz o campo `temperament` para português
+- Traduz o campo `description` para português
+
+**Normalização de Imagens:**
+- Para gatos: Usa o campo `image` nativo da API
+- Para cães: Mapeia o campo `image` para `url`
+
+  
 Essa normalização garante que ambas as APIs retornem dados consistentes e completos.
-
----
-
-## Estrutura do Projeto
-```
-AdoteUmPet/
-├── backend/                    # Backend API (Node.js + Express)
-│   ├── config/
-│   │   └── config.js          # Configuração do Sequelize CLI
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── database.js    # Configuração do banco de dados
-│   │   ├── controllers/       # Controladores da API
-│   │   │   ├── index.js
-│   │   │   └── petController.js # Controller de pets (GET, POST)
-│   │   ├── models/            # Modelos Sequelize
-│   │   │   ├── index.js
-│   │   │   └── pet.js
-│   │   ├── routes/            # Rotas da API
-│   │   │   ├── index.js
-│   │   │   └── petRoutes.js   # Rotas de pets (/pets)
-│   │   ├── utils/             # Funções utilitárias
-│   │   ├── migrations/        # Migrações do banco
-│   │   ├── seeders/           # Seeders do banco
-│   │   └── index.js           # Ponto de entrada da aplicação
-│   ├── .env.example           # Variáveis de ambiente
-│   ├── package.json           # Dependências do backend
-│   └── .sequelizerc           # Configuração do Sequelize CLI
-├── .gitignore                 # Arquivos ignorados pelo Git
-└── README.md                  # Documentação do projeto
-```
 
 ---
 
 ## Como Executar o Projeto
 
-### Pré-requisitos
+### 🐳 Opção 1: Docker (Recomendado)
 
-Antes de começar, você precisa ter instalado em sua máquina:
+A forma mais fácil e rápida de executar o projeto é usando Docker:
+
+#### Pré-requisitos
+- Docker e Docker Compose instalados
+
+#### Configuração Docker
+
+1. **Configure as variáveis de ambiente:**
+```bash
+# Edite o arquivo .env.docker e adicione suas chaves de API
+# DOG_API_KEY=sua_chave_da_dog_api  
+# CAT_API_KEY=sua_chave_da_cat_api
+```
+
+2. **Inicie todos os serviços:** //se for ambiente linux talvez precise de sudo
+```bash
+# Construir e iniciar backend + banco de dados
+docker-compose up --build  
+
+# Execute as migrações e popule o banco
+docker-compose exec app npm run migrate
+docker-compose exec app npm run seed
+```
+
+3. **Configure o frontend (em outro terminal):**
+```bash
+cd frontend
+cp .env.example .env  # Configure VITE_API_URL=http://localhost:3000
+npm install
+npm run dev
+```
+
+#### Serviços Disponíveis
+
+- **Frontend**: http://localhost:5173
+- **API Backend**: http://localhost:3000
+- **Documentação da API**: http://localhost:3000/docs
+- **Gerenciador de Banco**: http://localhost:8080 (Adminer)
+
+#### Comandos Úteis Docker
+
+```bash
+# Ver logs dos serviços
+docker-compose logs -f
+
+# Parar os serviços
+docker-compose down
+
+# Remover volumes (limpar banco)
+docker-compose down -v
+
+# Reconstruir apenas o backend
+docker-compose up --build app
+
+# Executar comandos no container
+docker-compose exec app npm run migrate
+docker-compose exec app npm run seed
+```
+
+---
+
+### 💻 Opção 2: Instalação Local
+
+#### Pré-requisitos
 - Node.js (versão 16 ou superior)
 - PostgreSQL (versão 12 ou superior)
 - Git
 
-### Passo a Passo da Instalação
+#### Passo a Passo da Instalação
 
 1. **Clone o repositório:**
 ```bash
@@ -215,6 +253,7 @@ DATABASE_URL=postgresql://username:password@localhost:5432/adote_um_pet
 DOG_API_KEY=sua_chave_da_dog_api
 CAT_API_KEY=sua_chave_da_cat_api
 PORT=3000
+CORS_ORIGIN=http://localhost:5173
 ```
 
 4. **Configure o banco de dados:**
@@ -228,6 +267,7 @@ npm run migrate
 # Execute as seeds (opcional)
 npm run seed
 ```
+
 5. **Inicie o servidor:**
 ```bash
 # Para desenvolvimento 
@@ -241,10 +281,37 @@ npm start
 ```bash
 cd frontend
 npm install
+cp .env.example .env  # Configure VITE_API_URL=http://localhost:3000
 npm run dev
 ```
 
 O backend estará rodando em `http://localhost:3000` e o frontend em `http://localhost:5173`.
+
+### 🧪 Executar Testes
+
+Para executar os testes automatizados:
+
+```bash
+# Configurar ambiente de teste
+cd backend
+cp .env.test.example .env.test
+# Edite .env.test com suas configurações de teste
+
+# Executar todos os testes
+npm test
+
+# Executar testes em modo watch
+npm run test:watch
+
+# Executar testes com relatório de cobertura
+npm run test:coverage
+```
+
+**Configuração do ambiente de teste:**
+- Usa banco de dados separado (adote_um_pet_test)
+- Limpa dados entre testes para isolamento
+- 29 testes implementados cobrindo POST e GET /pets
+- Cobertura atual: ~35% (foco em endpoints principais)
 
 ---
 
@@ -295,7 +362,6 @@ O backend estará rodando em `http://localhost:3000` e o frontend em `http://loc
 | created_at            | TIMESTAMP     | Data de criação     |
 | updated_at            | TIMESTAMP     | Data de atualização |
 
-> **🇧🇷 Migração realizada**: Campos de latitude/longitude foram substituídos por endereçamento brasileiro completo
 
 ---
 
@@ -308,19 +374,6 @@ O backend estará rodando em `http://localhost:3000` e o frontend em `http://loc
 
 ---
 
-## Variáveis de Ambiente
-| Variável     | Descrição |
-|--------------|-----------|
-| DATABASE_URL | String de conexão com PostgreSQL |
-| PORT         | Porta do servidor |
-| NODE_ENV     | Ambiente de execução (development/production) |
-| DOG_API_KEY  | Chave API externa para cães |
-| CAT_API_KEY  | Chave API externa para gatos |
-| JWT_SECRET   | Chave para autenticação futura |
-| CORS_ORIGIN  | Origem permitida para CORS |
-
----
-
 ## Scripts Disponíveis
 
 No diretório `backend/`, você pode executar:
@@ -330,6 +383,9 @@ No diretório `backend/`, você pode executar:
 - `npm run migrate` - Executa as migrations do banco de dados
 - `npm run seed` - Executa script idempotente para popular banco com dados CSV
 - `npm run seed:sequelize` - Executa os seeders tradicionais do Sequelize
+- `npm test` - Executa todos os testes com Jest
+- `npm run test:watch` - Executa testes em modo watch (re-executa ao salvar)
+- `npm run test:coverage` - Executa testes e gera relatório de cobertura
 
 ---
 
