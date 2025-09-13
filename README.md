@@ -27,10 +27,17 @@ API para gerenciamento de pets com CRUD completo, filtros, paginação, ordenaç
 - Paginação: `page` (padrão 1), `perPage` (padrão 10, máx 100)
 - Ordenação: `sortBy` (campos permitidos), `order` (asc/desc)
 
+### Implementadas
+- **GET /breeds/:species**: integração com TheDogAPI/TheCatAPI, cache em memória de 1 hora, normalização de resposta `{ name, origin, energy_level, image_url }`
+- **Frontend React**: Interface completa com Vite + Tailwind CSS
+- **Páginas**: Lista de Pets, Formulário de Pet, Detalhes do Pet, Raças
+- **Componentes**: Navbar, Loader, ErrorMessage
+- **Roteamento**: React Router com navegação completa
+- **API Service**: Integração com backend via axios
+
 ### Em andamento
 - **PUT /pets/:id**: atualização de pet existente
 - **DELETE /pets/:id**: remoção de pet
-- **GET /breeds/:species**: integração com TheDogAPI/TheCatAPI, cache em memória de 1 hora, normalização de resposta `{ name, origin, energy_level, image_url }`
 
 ---
 
