@@ -9,12 +9,16 @@ const PetForm = () => {
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    species: 'dog',
+    species: '',
     breed: '',
     age_years: '',
+    description: '',
     shelter_city: '',
-    shelter_lat: '',
-    shelter_lng: '',
+    shelter_cep: '',
+    shelter_street: '',
+    shelter_number: '',
+    shelter_neighborhood: '',
+    shelter_state: '',
     status: 'available'
   });
 
@@ -26,18 +30,40 @@ const PetForm = () => {
     }));
   };
 
+
+  const fetchCepData = async (cep) => {
+    try {
+      const cleanCep = cep.replace(/\D/g, '');
+      if (cleanCep.length !== 8) return;
+
+      const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        setFormData(prev => ({
+          ...prev,
+          shelter_cep: cep,
+          shelter_street: data.logradouro || '',
+          shelter_neighborhood: data.bairro || '',
+          shelter_city: data.localidade || '',
+          shelter_state: data.uf || ''
+        }));
+      }
+    } catch (error) {
+      console.error('Erro ao buscar CEP:', error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // Converte campos numéricos
+      // converte campos numéricos
       const submitData = {
         ...formData,
-        age_years: parseInt(formData.age_years),
-        shelter_lat: parseFloat(formData.shelter_lat),
-        shelter_lng: parseFloat(formData.shelter_lng)
+        age_years: parseInt(formData.age_years)
       };
 
       await petsAPI.createPet(submitData);
@@ -89,6 +115,7 @@ const PetForm = () => {
                 required
                 className="input"
               >
+                <option value="">Selecione uma espécie</option>
                 <option value="dog">🐕 Cachorro</option>
                 <option value="cat">🐱 Gato</option>
               </select>
@@ -128,21 +155,6 @@ const PetForm = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Cidade do Abrigo *
-              </label>
-              <input
-                type="text"
-                name="shelter_city"
-                value={formData.shelter_city}
-                onChange={handleChange}
-                required
-                className="input"
-                placeholder="Ex: São Paulo"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status
               </label>
               <select
@@ -155,43 +167,116 @@ const PetForm = () => {
                 <option value="adopted">Adotado</option>
               </select>
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Latitude *
-              </label>
-              <input
-                type="number"
-                name="shelter_lat"
-                value={formData.shelter_lat}
-                onChange={handleChange}
-                required
-                step="any"
-                min="-90"
-                max="90"
-                className="input"
-                placeholder="Ex: -23.5505"
-              />
+          {/* Campos de endereço brasileiro */}
+          <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h3 className="text-lg font-medium text-blue-900 mb-4">📍 Endereço do Abrigo</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  CEP *
+                </label>
+                <input
+                  type="text"
+                  name="shelter_cep"
+                  value={formData.shelter_cep}
+                  onChange={(e) => {
+                    handleChange(e);
+                    if (e.target.value.replace(/\D/g, '').length === 8) {
+                      fetchCepData(e.target.value);
+                    }
+                  }}
+                  required
+                  className="input"
+                  placeholder="00000-000"
+                  maxLength="9"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Rua/Logradouro *
+                </label>
+                <input
+                  type="text"
+                  name="shelter_street"
+                  value={formData.shelter_street}
+                  onChange={handleChange}
+                  required
+                  className="input"
+                  placeholder="Ex: Rua das Flores"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Número *
+                </label>
+                <input
+                  type="text"
+                  name="shelter_number"
+                  value={formData.shelter_number}
+                  onChange={handleChange}
+                  required
+                  className="input"
+                  placeholder="Ex: 123"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Bairro *
+                </label>
+                <input
+                  type="text"
+                  name="shelter_neighborhood"
+                  value={formData.shelter_neighborhood}
+                  onChange={handleChange}
+                  required
+                  className="input"
+                  placeholder="Ex: Centro"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Cidade *
+                </label>
+                <input
+                  type="text"
+                  name="shelter_city"
+                  value={formData.shelter_city}
+                  onChange={handleChange}
+                  required
+                  className="input"
+                  placeholder="Ex: São Paulo"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Estado *
+                </label>
+                <input
+                  type="text"
+                  name="shelter_state"
+                  value={formData.shelter_state}
+                  onChange={handleChange}
+                  required
+                  className="input"
+                  placeholder="Ex: SP"
+                  maxLength="2"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Longitude *
-              </label>
-              <input
-                type="number"
-                name="shelter_lng"
-                value={formData.shelter_lng}
-                onChange={handleChange}
-                required
-                step="any"
-                min="-180"
-                max="180"
-                className="input"
-                placeholder="Ex: -46.6333"
-              />
+            <div className="text-sm text-blue-600 bg-blue-100 p-3 rounded">
+              💡 <strong>Dica:</strong> Digite o CEP e os outros campos serão preenchidos automaticamente!
             </div>
           </div>
+
 
           <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
             <button

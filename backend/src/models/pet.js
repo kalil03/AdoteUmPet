@@ -71,31 +71,68 @@ module.exports = (sequelize) => { //exporta o modelo pet
         }
       }
     },
-    shelter_lat: {
-      type: DataTypes.DECIMAL(10, 7),
+    shelter_cep: {
+      type: DataTypes.STRING(9),
       allowNull: false,
       validate: {
-        min: {
-          args: [-90],
-          msg: 'A latitude deve estar entre -90 e 90'
+        notEmpty: {
+          msg: 'O CEP do abrigo é obrigatório'
         },
-        max: {
-          args: [90],
-          msg: 'A latitude deve estar entre -90 e 90'
+        len: {
+          args: [8, 9],
+          msg: 'O CEP deve ter 8 ou 9 caracteres'
         }
       }
     },
-    shelter_lng: {
-      type: DataTypes.DECIMAL(10, 7),
+    shelter_street: {
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        min: {
-          args: [-180],
-          msg: 'A longitude deve estar entre -180 e 180'
+        notEmpty: {
+          msg: 'A rua do abrigo é obrigatória'
         },
-        max: {
-          args: [180],
-          msg: 'A longitude deve estar entre -180 e 180'
+        len: {
+          args: [1, 255],
+          msg: 'A rua deve ter entre 1 e 255 caracteres'
+        }
+      }
+    },
+    shelter_number: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          msg: 'O número do abrigo é obrigatório'
+        },
+        len: {
+          args: [1, 20],
+          msg: 'O número deve ter entre 1 e 20 caracteres'
+        }
+      }
+    },
+    shelter_neighborhood: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          msg: 'O bairro do abrigo é obrigatório'
+        },
+        len: {
+          args: [1, 100],
+          msg: 'O bairro deve ter entre 1 e 100 caracteres'
+        }
+      }
+    },
+    shelter_state: {
+      type: DataTypes.STRING(2),
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          msg: 'O estado do abrigo é obrigatório'
+        },
+        len: {
+          args: [2, 2],
+          msg: 'O estado deve ter exatamente 2 caracteres'
         }
       }
     },

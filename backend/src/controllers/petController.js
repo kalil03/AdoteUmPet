@@ -40,6 +40,8 @@ const getPets = async (req, res) => {
       species,
       breed,
       shelter_city,
+      shelter_state,
+      shelter_neighborhood,
       status,
       page = 1,
       perPage = 10,
@@ -96,6 +98,16 @@ const getPets = async (req, res) => {
         [Op.iLike]: `%${shelter_city}%`
       };
     }
+    if (shelter_state) {
+      whereClause.shelter_state = {
+        [Op.iLike]: `%${shelter_state}%`
+      };
+    }
+    if (shelter_neighborhood) {
+      whereClause.shelter_neighborhood = {
+        [Op.iLike]: `%${shelter_neighborhood}%`
+      };
+    }
     if (status) {
       whereClause.status = status;
     }
@@ -130,7 +142,19 @@ const getPets = async (req, res) => {
 
 const createPet = async (req, res) => {
   try {
-    const { name, species, breed, age_years, shelter_city, shelter_lat, shelter_lng, status } = req.body;
+    const { 
+      name, 
+      species, 
+      breed, 
+      age_years, 
+      shelter_city, 
+      shelter_cep, 
+      shelter_street, 
+      shelter_number, 
+      shelter_neighborhood, 
+      shelter_state, 
+      status 
+    } = req.body;
 
     const errors = [];
 
@@ -155,13 +179,26 @@ const createPet = async (req, res) => {
       errors.push('Cidade do abrigo é obrigatória e deve ser uma string não vazia');
     }
 
-    if (shelter_lat === undefined || shelter_lat === null || typeof shelter_lat !== 'number' || shelter_lat < -90 || shelter_lat > 90) {
-      errors.push('Latitude é obrigatória e deve ser um número entre -90 e 90');
+    if (!shelter_cep || typeof shelter_cep !== 'string' || shelter_cep.trim().length === 0) {
+      errors.push('CEP do abrigo é obrigatório e deve ser uma string não vazia');
     }
 
-    if (shelter_lng === undefined || shelter_lng === null || typeof shelter_lng !== 'number' || shelter_lng < -180 || shelter_lng > 180) {
-      errors.push('Longitude é obrigatória e deve ser um número entre -180 e 180');
+    if (!shelter_street || typeof shelter_street !== 'string' || shelter_street.trim().length === 0) {
+      errors.push('Rua do abrigo é obrigatória e deve ser uma string não vazia');
     }
+
+    if (!shelter_number || typeof shelter_number !== 'string' || shelter_number.trim().length === 0) {
+      errors.push('Número do abrigo é obrigatório e deve ser uma string não vazia');
+    }
+
+    if (!shelter_neighborhood || typeof shelter_neighborhood !== 'string' || shelter_neighborhood.trim().length === 0) {
+      errors.push('Bairro do abrigo é obrigatório e deve ser uma string não vazia');
+    }
+
+    if (!shelter_state || typeof shelter_state !== 'string' || shelter_state.trim().length !== 2) {
+      errors.push('Estado do abrigo é obrigatório e deve ter exatamente 2 caracteres');
+    }
+
     //status opcional
     if (status && !['available', 'adopted'].includes(status)) {
       errors.push('Status deve ser "available" ou "adopted"');
@@ -174,6 +211,7 @@ const createPet = async (req, res) => {
         details: errors
       });
     }
+
     //dados no animal
     const petData = {
       name: name.trim(),
@@ -181,8 +219,11 @@ const createPet = async (req, res) => {
       breed: breed.trim(),
       age_years,
       shelter_city: shelter_city.trim(),
-      shelter_lat,
-      shelter_lng,
+      shelter_cep: shelter_cep.trim(),
+      shelter_street: shelter_street.trim(),
+      shelter_number: shelter_number.trim(),
+      shelter_neighborhood: shelter_neighborhood.trim(),
+      shelter_state: shelter_state.trim().toUpperCase(),
       status: status || 'available'
     };
     //criar pet usand sequelize
@@ -212,8 +253,207 @@ const createPet = async (req, res) => {
   }
 };
 
+const updatePet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      name, 
+      species, 
+      breed, 
+      age_years, 
+      shelter_city, 
+      shelter_cep, 
+      shelter_street, 
+      shelter_number, 
+      shelter_neighborhood, 
+      shelter_state, 
+      status 
+    } = req.body;
+
+    // valida se o ID foi fornecido
+    if (!id) {
+      return res.status(400).json({
+        error: 'ID inválido',
+        message: 'ID do pet é obrigatório'
+      });
+    }
+
+    // busca o pet existente
+    const existingPet = await Pet.findByPk(id);
+    if (!existingPet) {
+      return res.status(404).json({
+        error: 'Pet not found',
+        message: 'Pet não encontrado com o ID fornecido'
+      });
+    }
+
+    const errors = [];
+
+    // validacao de campos se fornecidos
+    if (name !== undefined) {
+      if (!name || typeof name !== 'string' || name.trim().length === 0) {
+        errors.push('Nome deve ser uma string não vazia');
+      }
+    }
+
+    if (species !== undefined) {
+      if (!['dog', 'cat'].includes(species)) {
+        errors.push('Espécie deve ser "dog" ou "cat"');
+      }
+    }
+
+    if (breed !== undefined) {
+      if (!breed || typeof breed !== 'string' || breed.trim().length === 0) {
+        errors.push('Raça deve ser uma string não vazia');
+      }
+    }
+
+    if (age_years !== undefined) {
+      if (typeof age_years !== 'number' || age_years < 0) {
+        errors.push('Idade deve ser um número maior ou igual a 0');
+      }
+    }
+
+    if (shelter_city !== undefined) {
+      if (!shelter_city || typeof shelter_city !== 'string' || shelter_city.trim().length === 0) {
+        errors.push('Cidade do abrigo deve ser uma string não vazia');
+      }
+    }
+
+    if (shelter_cep !== undefined) {
+      if (!shelter_cep || typeof shelter_cep !== 'string' || shelter_cep.trim().length === 0) {
+        errors.push('CEP do abrigo deve ser uma string não vazia');
+      }
+    }
+
+    if (shelter_street !== undefined) {
+      if (!shelter_street || typeof shelter_street !== 'string' || shelter_street.trim().length === 0) {
+        errors.push('Rua do abrigo deve ser uma string não vazia');
+      }
+    }
+
+    if (shelter_number !== undefined) {
+      if (!shelter_number || typeof shelter_number !== 'string' || shelter_number.trim().length === 0) {
+        errors.push('Número do abrigo deve ser uma string não vazia');
+      }
+    }
+
+    if (shelter_neighborhood !== undefined) {
+      if (!shelter_neighborhood || typeof shelter_neighborhood !== 'string' || shelter_neighborhood.trim().length === 0) {
+        errors.push('Bairro do abrigo deve ser uma string não vazia');
+      }
+    }
+
+    if (shelter_state !== undefined) {
+      if (!shelter_state || typeof shelter_state !== 'string' || shelter_state.trim().length !== 2) {
+        errors.push('Estado do abrigo deve ter exatamente 2 caracteres');
+      }
+    }
+
+    if (status !== undefined) {
+      if (!['available', 'adopted'].includes(status)) {
+        errors.push('Status deve ser "available" ou "adopted"');
+      }
+    }
+
+    // se tiver erros, retorna
+    if (errors.length > 0) {
+      return res.status(400).json({
+        error: 'Dados inválidos',
+        message: 'Os seguintes campos contêm erros:',
+        details: errors
+      });
+    }
+
+    // prepara dados para atualização (apenas campos fornecidos)
+    const updateData = {};
+    if (name !== undefined) updateData.name = name.trim();
+    if (species !== undefined) updateData.species = species;
+    if (breed !== undefined) updateData.breed = breed.trim();
+    if (age_years !== undefined) updateData.age_years = age_years;
+    if (shelter_city !== undefined) updateData.shelter_city = shelter_city.trim();
+    if (shelter_cep !== undefined) updateData.shelter_cep = shelter_cep.trim();
+    if (shelter_street !== undefined) updateData.shelter_street = shelter_street.trim();
+    if (shelter_number !== undefined) updateData.shelter_number = shelter_number.trim();
+    if (shelter_neighborhood !== undefined) updateData.shelter_neighborhood = shelter_neighborhood.trim();
+    if (shelter_state !== undefined) updateData.shelter_state = shelter_state.trim().toUpperCase();
+    if (status !== undefined) updateData.status = status;
+
+    // atualiza o pet
+    await existingPet.update(updateData);
+
+    res.status(200).json({
+      message: 'Pet atualizado com sucesso',
+      pet: existingPet
+    });
+
+  } catch (error) {
+    console.error('Erro ao atualizar pet:', error);
+    
+    // erros de validacao do sequelize
+    if (error.name === 'SequelizeValidationError') {
+      const validationErrors = error.errors.map(err => err.message);
+      return res.status(400).json({
+        error: 'Erro de validação',
+        message: 'Os dados fornecidos não atendem aos critérios de validação',
+        details: validationErrors
+      });
+    }
+
+    res.status(500).json({
+      error: 'Erro interno do servidor',
+      message: 'Não foi possível atualizar o pet'
+    });
+  }
+};
+
+const deletePet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Validate if ID was provided
+    if (!id) {
+      return res.status(400).json({
+        error: 'ID inválido',
+        message: 'ID do pet é obrigatório'
+      });
+    }
+    
+    //encontre o primeiro pet
+    const pet = await Pet.findByPk(id);
+    if (!pet) {
+      return res.status(404).json({
+        error: 'Pet not found',
+        message: 'Pet não encontrado com o ID fornecido'
+      });
+    }
+    
+    //deletar pet
+    await Pet.destroy({
+      where: { id }
+    });
+    
+    res.status(200).json({
+      message: 'Pet deletado com sucesso',
+      pet: {
+        id: pet.id,
+        name: pet.name
+      }
+    });
+    
+  } catch (error) {
+    console.error('Erro ao deletar pet:', error);
+    res.status(500).json({
+      error: 'Erro interno do servidor',
+      message: 'Não foi possível deletar o pet'
+    });
+  }
+};
+
 module.exports = {
   getPetById,
   getPets,
-  createPet
+  createPet,
+  updatePet,
+  deletePet
 };

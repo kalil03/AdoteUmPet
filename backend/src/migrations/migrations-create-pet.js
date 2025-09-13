@@ -30,12 +30,24 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      shelter_lat: { //latitude 
-        type: Sequelize.DECIMAL(10, 7),
+      shelter_cep: {
+        type: Sequelize.STRING(9),
         allowNull: false
       },
-      shelter_lng: { //longitude
-        type: Sequelize.DECIMAL(10, 7),
+      shelter_street: {
+        type: Sequelize.STRING(255),
+        allowNull: false
+      },
+      shelter_number: {
+        type: Sequelize.STRING(20),
+        allowNull: false
+      },
+      shelter_neighborhood: {
+        type: Sequelize.STRING(100),
+        allowNull: false
+      },
+      shelter_state: {
+        type: Sequelize.STRING(2),
         allowNull: false
       },
       status: { 
