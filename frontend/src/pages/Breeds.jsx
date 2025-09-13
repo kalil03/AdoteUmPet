@@ -172,6 +172,15 @@ const Breeds = () => {
                         {getEnergyLevel(breed.energy_level)}
                       </div>
                     )}
+                    
+                    {breed.temperament && (
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                          Temperamento
+                        </label>
+                        <p className="text-sm text-gray-700">{breed.temperament}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

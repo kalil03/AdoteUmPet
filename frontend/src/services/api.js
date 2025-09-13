@@ -49,7 +49,7 @@ export const petsAPI = {
     return api.put(`/pets/${id}`, petData);
   },
 
-  //deleter
+  //deletar
   deletePet: (id) => {
     return api.delete(`/pets/${id}`);
   },
