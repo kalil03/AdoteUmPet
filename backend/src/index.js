@@ -3,9 +3,9 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
-
-// importa rota
+//importa rotas
 const petRoutes = require('./routes/petRoutes');
+const breedRoutes = require('./routes/breedRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,13 +28,15 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/health',
-      pets: '/pets'
+      pets: '/pets',
+      breeds: '/breeds'
     }
   });
 });
 
-// registra rota
+// registra rotas
 app.use('/pets', petRoutes);
+app.use('/breeds', breedRoutes);
 //tratamento erros
 app.use((err, req, res, next) => {
   console.error(err.stack);

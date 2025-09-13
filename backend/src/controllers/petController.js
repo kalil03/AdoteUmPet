@@ -4,23 +4,23 @@ const { Op } = require('sequelize');
 const getPetById = async (req, res) => {
   try {
     const { id } = req.params;
-    // valida se o ID foi fornecido
+    //valida se o ID foi fornecido
     if (!id) {
       return res.status(400).json({
         error: 'ID inválido',
         message: 'ID do pet é obrigatório'
       });
     }
-    // busca pet por id
+    //usca pet por id
     const pet = await Pet.findByPk(id);
-    // se não encontrou, retorna 404
+    //se não encontrou, retorna 404
     if (!pet) {
       return res.status(404).json({
         error: 'Pet not found',
         message: 'Pet não encontrado com o ID fornecido'
       });
     }
-    // retorna o pet encontrado
+    //retorna o pet encontrado
     res.status(200).json(pet);
 
   } catch (error) {
