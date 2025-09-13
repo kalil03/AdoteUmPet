@@ -30,6 +30,8 @@ const PetDetail = () => {
   });
   const [submittingInterest, setSubmittingInterest] = useState(false);
   const [interestSuccess, setInterestSuccess] = useState(false);
+  const [mapCoordinates, setMapCoordinates] = useState(null);
+  const [mapLoading, setMapLoading] = useState(false);
 
   useEffect(() => {
     const fetchPet = async () => {
@@ -49,6 +51,44 @@ const PetDetail = () => {
       fetchPet();
     }
   }, [id]);
+
+  //geocodificar endereço quando pet for carregado
+  useEffect(() => {
+    const geocodeAddress = async () => {
+      if (!pet || !pet.shelter_cep) return;
+      
+      setMapLoading(true);
+      try {
+        const address = `${pet.shelter_street}, ${pet.shelter_number}, ${pet.shelter_neighborhood}, ${pet.shelter_city}, ${pet.shelter_state}, ${pet.shelter_cep}`;
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=br&limit=1`);
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          setMapCoordinates({
+            lat: parseFloat(data[0].lat),
+            lng: parseFloat(data[0].lon)
+          });
+        } else {
+          // Fallback: tentar apenas com CEP
+          const cepResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${pet.shelter_cep}&countrycodes=br&limit=1`);
+          const cepData = await cepResponse.json();
+          
+          if (cepData && cepData.length > 0) {
+            setMapCoordinates({
+              lat: parseFloat(cepData[0].lat),
+              lng: parseFloat(cepData[0].lon)
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao geocodificar endereço:', error);
+      } finally {
+        setMapLoading(false);
+      }
+    };
+
+    geocodeAddress();
+  }, [pet]);
 
   const getStatusBadge = (status) => {
     const statusConfig = {
@@ -93,7 +133,7 @@ const PetDetail = () => {
   const handleInterestSubmit = async (e) => {
     e.preventDefault();
     
-    // Validação básica
+    //validação básica
     if (!interestForm.name || !interestForm.email || !interestForm.phone) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
@@ -102,7 +142,7 @@ const PetDetail = () => {
     try {
       setSubmittingInterest(true);
       
-      // Simular envio (você pode implementar a API real depois)
+      //simular envio (você pode implementar a API real depois)
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       setInterestSuccess(true);
@@ -227,6 +267,55 @@ const PetDetail = () => {
                   <br />
                   {pet.shelter_city}, {pet.shelter_state} - CEP: {pet.shelter_cep}
                 </p>
+              </div>
+
+              {/* Mapa */}
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-500 mb-3">📍 Localização no Mapa</label>
+                {mapLoading ? (
+                  <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                      <p className="text-sm text-gray-500">Carregando mapa...</p>
+                    </div>
+                  </div>
+                ) : mapCoordinates ? (
+                  <div className="h-64 rounded-lg overflow-hidden border border-gray-200">
+                    <MapContainer
+                      center={[mapCoordinates.lat, mapCoordinates.lng]}
+                      zoom={16}
+                      style={{ height: '100%', width: '100%' }}
+                    >
+                      <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <Marker position={[mapCoordinates.lat, mapCoordinates.lng]}>
+                        <Popup>
+                          <div className="text-center">
+                            <p className="font-medium">{pet.name}</p>
+                            <p className="text-sm text-gray-600">{pet.breed}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {pet.shelter_street}, {pet.shelter_number}
+                              <br />
+                              {pet.shelter_neighborhood} - {pet.shelter_city}/{pet.shelter_state}
+                            </p>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    </MapContainer>
+                  </div>
+                ) : (
+                  <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div className="text-center">
+                      <svg className="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <p className="text-sm text-gray-500">Não foi possível localizar o endereço no mapa</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

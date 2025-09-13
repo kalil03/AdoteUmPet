@@ -38,8 +38,8 @@ Sistema completo para gerenciamento de pets com CRUD, filtros, paginação, orde
 - Filtro por espécie (cão ou gato)
 - Filtro por raça (busca parcial)
 - Filtro por cidade do abrigo (busca parcial)
-- **Filtro por estado** (busca parcial)
-- **Filtro por bairro** (busca parcial)
+- Filtro por estado (busca parcial)
+- Filtro por bairro (busca parcial)
 - Filtro por status de adoção
 - Paginação configurável (padrão: 10 itens por página, máximo: 100)
 - Ordenação por diferentes campos (crescente/decrescente)
@@ -47,21 +47,25 @@ Sistema completo para gerenciamento de pets com CRUD, filtros, paginação, orde
 **Frontend React:**
 - Interface completa desenvolvida com Vite e Tailwind CSS
 - Páginas: Lista de Pets, Cadastro de Pet, Detalhes do Pet, Consulta de Raças
-- **Formulário brasileiro**: Campos de CEP, rua, número, bairro, cidade, estado
-- **Preenchimento automático**: Integração com ViaCEP para busca por CEP
+- **Formulário brasileiro:** Campos de CEP, rua, número, bairro, cidade, estado no lugar de latitude e longitude
+- **Preenchimento automático:** Integração com ViaCEP para busca por CEP
 - **Exibição de endereço**: Lista e detalhes mostram endereço completo formatado
+- **Mapa interativo**: Visualização da localização dos abrigos com Leaflet
 - Componentes reutilizáveis: Navbar, Loader, ErrorMessage
 - Navegação com React Router
 - Integração com a API via axios
 
+**Sistema de dados:**
+- **Seeds idempotentes**: Script automatizado para popular banco com dados CSV
+- **Dados de exemplo**: 15 pets de diferentes cidades brasileiras
+- **Upsert seguro**: Importação que pode ser executada múltiplas vezes
+
 ### Próximas melhorias
-- **Mapa interativo**: Integração com mapas para visualizar localização dos abrigos
 - **Testes automatizados**: Backend e frontend com cobertura > 60% e relatórios
 - **Cache de filtros**: Sistema de cache para consultas de pets com filtros
 - **Docker Compose**: Containerização completa (API + PostgreSQL + Adminer/PgAdmin)
 - **CI/CD Pipeline**: Integração contínua com lint e testes automatizados
 - **Swagger/OpenAPI**: Documentação interativa da API
-- **Seeds idempotentes**: Importação de dados a partir de arquivos CSV
 
 ---
 
@@ -85,6 +89,7 @@ Sistema completo para gerenciamento de pets com CRUD, filtros, paginação, orde
 - dotenv para gerenciamento de variáveis de ambiente
 - Nodemon para desenvolvimento  
 - Sequelize CLI para migrations e seeders
+- **csv-parser** para processamento de arquivos CSV
 - **ViaCEP API** para consulta automática de endereços brasileiros
 
 ---
@@ -219,11 +224,13 @@ createdb adote_um_pet
 
 # Execute as migrations
 npm run migrate
-```
 
+# Execute as seeds (opcional)
+npm run seed
+```
 5. **Inicie o servidor:**
 ```bash
-# Para desenvolvimento (com hot reload)
+# Para desenvolvimento 
 npm run dev
 
 # Para produção
@@ -321,7 +328,8 @@ No diretório `backend/`, você pode executar:
 - `npm run dev` - Inicia o servidor em modo de desenvolvimento com hot reload
 - `npm start` - Inicia o servidor em modo de produção
 - `npm run migrate` - Executa as migrations do banco de dados
-- `npm run seed` - Executa os seeders para popular o banco com dados de exemplo
+- `npm run seed` - Executa script idempotente para popular banco com dados CSV
+- `npm run seed:sequelize` - Executa os seeders tradicionais do Sequelize
 
 ---
 
