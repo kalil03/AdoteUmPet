@@ -1,0 +1,44 @@
+version: '3.3'
+
+services:
+  postgres:
+    image: postgres:13-alpine
+    container_name: adote_um_pet_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: adote_um_pet
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: naoabandoneospets
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer:4.8.1
+    container_name: adote_um_pet_adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  app:
+    build: ./backend
+    container_name: adote_um_pet_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:naoabandoneospets@postgres:5432/adote_um_pet
+      - NODE_ENV=production
+      - PORT=3000
+      - DOG_API_KEY=sua_chave_da_dog_api
+      - CAT_API_KEY=sua_chave_da_cat_api
+      - JWT_SECRET=sua_jwt
+      - CORS_ORIGIN=http://localhost:5173
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
