@@ -1,0 +1,16 @@
+id,name,species,breed,age_years,shelter_city,shelter_cep,shelter_street,shelter_number,shelter_neighborhood,shelter_state,status
+550e8400-e29b-41d4-a716-446655440000,Max,dog,Golden Retriever,3,São Paulo,01310-100,Avenida Paulista,1000,Bela Vista,SP,available
+550e8400-e29b-41d4-a716-446655440001,Luna,cat,Siamese,2,Rio de Janeiro,22071-900,Avenida Atlântica,500,Copacabana,RJ,available
+550e8400-e29b-41d4-a716-446655440002,Thor,dog,German Shepherd,5,Belo Horizonte,30112-000,Rua da Bahia,1200,Centro,MG,adopted
+550e8400-e29b-41d4-a716-446655440003,Mia,cat,Persian,1,Porto Alegre,90010-150,Rua dos Andradas,1500,Centro Histórico,RS,available
+550e8400-e29b-41d4-a716-446655440004,Rex,dog,Labrador,4,Curitiba,80020-320,Rua XV de Novembro,800,Centro,PR,available
+550e8400-e29b-41d4-a716-446655440005,Bella,cat,Maine Coon,3,Salvador,40070-110,Rua Chile,200,Centro,BA,available
+550e8400-e29b-41d4-a716-446655440006,Duke,dog,Bulldog,6,Fortaleza,60025-100,Rua Major Facundo,300,Centro,CE,adopted
+550e8400-e29b-41d4-a716-446655440007,Nala,cat,British Shorthair,2,Recife,50030-230,Rua do Hospício,400,Boa Vista,PE,available
+550e8400-e29b-41d4-a716-446655440008,Zeus,dog,Rottweiler,7,Brasília,70040-010,SCS Quadra 2,100,Asa Sul,DF,available
+550e8400-e29b-41d4-a716-446655440009,Chloe,cat,Ragdoll,4,Goiânia,74023-010,Rua 3,250,Setor Central,GO,available
+550e8400-e29b-41d4-a716-446655440010,Rocky,dog,Poodle,2,Manaus,69010-060,Avenida Eduardo Ribeiro,600,Centro,AM,available
+550e8400-e29b-41d4-a716-446655440011,Sophie,cat,Scottish Fold,3,Belém,66010-000,Avenida Presidente Vargas,700,Campina,PA,adopted
+550e8400-e29b-41d4-a716-446655440012,Bruno,dog,Beagle,1,Vitória,29010-110,Rua Jerônimo Monteiro,150,Centro,ES,available
+550e8400-e29b-41d4-a716-446655440013,Lily,cat,Abyssinian,5,Florianópolis,88010-400,Rua Felipe Schmidt,350,Centro,SC,available
+550e8400-e29b-41d4-a716-446655440014,Cooper,dog,Border Collie,3,Campo Grande,79002-073,Rua 14 de Julho,450,Centro,MS,available

@@ -7,7 +7,8 @@
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
     "migrate": "sequelize-cli db:migrate",
-    "seed": "sequelize-cli db:seed:all"
+    "seed": "node scripts/seed.js",
+    "seed:sequelize": "sequelize-cli db:seed:all"
   },
   "keywords": [
     "pet",
@@ -21,6 +22,7 @@
   "dependencies": {
     "axios": "^1.12.1",
     "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
     "dotenv": "^16.6.1",
     "express": "^4.18.2",
     "helmet": "^7.1.0",
