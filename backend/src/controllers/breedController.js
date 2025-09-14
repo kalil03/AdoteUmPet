@@ -617,7 +617,9 @@ const normalizeCatBreed = (breed) => {
     origin: breed.origin || 'Origem não disponível',
     energy_level: breed.energy_level || 3,
     temperament: translateTemperament(breed.temperament),
-    image_url: breed.image?.url || null
+    image_url: breed.reference_image_id 
+      ? `https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg`
+      : null
   };
 };
 //filtrar raças por nome
